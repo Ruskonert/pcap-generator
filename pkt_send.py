@@ -11,6 +11,7 @@ import subprocess
 import signal
 import threading
 import os
+import ctypes
 import struct
 
 from threading import Thread
@@ -20,14 +21,14 @@ PKT_EXEC_VERSION = '1.0.0'
 print("Packet Generator {}".format(PKT_EXEC_VERSION))
 
 def print_help():
-    print("Usuge: {} [-h|--help] [-d|--delay=<interval_ms>] [-s|source_addr=<ip>:<port>] [-d|--dest_addr=<ip>:<port>] [--source_mac=<MAC>] [-l|--loop=<loop_count>] [--dest_mac=<MAC>] [--tcp] [--udp] [--save] (rule_file)".format(sys.argv[0]))
+    print("Usuge: {} [-h|--help] [-d|--delay=<interval_ms>] [-s|source_addr=<ip>:<port>] [-d|--dest_addr=<ip>:<port>] [--source_mac=<MAC>] [-l|--loop=<loop_count>] [--dest_mac=<MAC>] [--tcp] [--udp] (rule_file)".format(sys.argv[0]))
 
 PKT_IF_NAME         = None
 PKT_TIME_DELAY      = 0
 PKT_SOURCE_IP       = None
 PKT_SOURCE_PORT     = 12345
 PKT_DEST_IP         = None
-PKT_IS_SAVE         = False
+PKT_IS_SAVE         = True
 PKT_DEST_PORT       = 61442
 PKT_FILE_PATH       = None
 PKT_TCPDUMP_VERSION = None
@@ -61,9 +62,6 @@ if len(sys.argv) > 1:
         elif option in ['-h', '--help']:
             print_help()
             sys.exit(1)
-
-        elif option in ['--save']:
-            PKT_IS_SAVE = True
 
         elif option in ['--source_mac']:
             PKT_SOURCE_MAC = arg
@@ -112,11 +110,18 @@ if PKT_DEST_IP and len(PKT_DEST_IP.split(":")) > 1:
     PKT_DEST_IP = _sp[0]
     PKT_DEST_PORT = int(_sp[1])
 
+IS_WINDOWS = False
 
 ## check the user has root permisssion
-if os.getuid() != 0:
-    print("You need to sudo permisssion")
+try:
+    if os.getuid() != 0:
+        print("You need to sudo permisssion")
+        sys.exit(1)
+except AttributeError:
+    IS_WINDOWS = True
+    print("Not yet supported the Windows OS, Sorry!")
     sys.exit(1)
+    
 
 
 ## check the tcpdump is installed on the system
