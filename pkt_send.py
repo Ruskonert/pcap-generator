@@ -21,7 +21,7 @@ PKT_EXEC_VERSION = '1.0.0'
 print("Packet Generator {}".format(PKT_EXEC_VERSION))
 
 def print_help():
-    print("Usuge: {} [-h|--help] [-d|--delay=<interval_ms>] [-s|source_addr=<ip>:<port>] [-d|--dest_addr=<ip>:<port>] [--source_mac=<MAC>] [-l|--loop=<loop_count>] [--dest_mac=<MAC>] [--tcp] [--udp] (rule_file)".format(sys.argv[0]))
+    print("Usuge: {} [-h|--help] [-t|--time=<delay_interval_ms>] [-s|source_addr=<ip>:<port>] [-d|--dest_addr=<ip>:<port>] [--source_mac=<MAC>] [-l|--loop=<loop_count>] [--dest_mac=<MAC>] [--tcp] [--udp] (rule_file)".format(sys.argv[0]))
 
 PKT_IF_NAME         = None
 PKT_TIME_DELAY      = 0
@@ -68,7 +68,7 @@ if len(sys.argv) > 1:
 
         elif option in ['--dest_mac']:
             PKT_DEST_MAC = arg
-    
+
         elif option in ['--tcp']:
             if PKT_ENABLE_UDP:
                 print("Please one select transport type (tcp or udp)!")
@@ -82,12 +82,12 @@ if len(sys.argv) > 1:
             PKT_ENABLE_UDP = True
         else:
             continue
-            
-        
+
+
     if len(args) == 0:
         print("Please specify the rule file path!")
         sys.exit(0)
-    
+
     PKT_FILE_PATH = args[0]
 else:
     print_help()
@@ -121,7 +121,7 @@ except AttributeError:
     IS_WINDOWS = True
     print("Not yet supported the Windows OS, Sorry!")
     sys.exit(1)
-    
+
 
 
 ## check the tcpdump is installed on the system
@@ -189,15 +189,15 @@ def interrupt_exit(s, _):
     print("*== Interrupt call ... {}".format(s))
     if th1:
         th1.join()
-    
+
     if tcpdump_ps:
         os.system("sudo pkill -2 -P " + str(tcpdump_ps.pid))
         os.remove("_pcap_temp_internal.pcap")
-    
+
     try:
         if slave_s:
             slave_s.close()
-        
+
         if master_s:
             master_s.close()
     except:
@@ -339,9 +339,9 @@ for _ in range(PKT_LOOP_COUNT):
             _send_packet_data_tcp(slave_s, conn_slave_s, PKT_PAYLOAD_DATA[payload_idx][0], PKT_PAYLOAD_DATA[payload_idx][1])
         else:
             _send_packet_data_udp(slave_s, master_s, ('localhost', PKT_SOURCE_PORT), ('localhost', PKT_DEST_PORT), PKT_PAYLOAD_DATA[payload_idx][0], PKT_PAYLOAD_DATA[payload_idx][1])
-        
+
         socket_lock.acquire()
-        
+
         if PKT_TIME_DELAY > 0:
             time.sleep(PKT_TIME_DELAY / 1000)
         socket_lock.release()
@@ -386,7 +386,7 @@ if PKT_IS_SAVE:
         if PKT_SOURCE_MAC:
             bin_source_mac_data = bytes.fromhex("".join(PKT_SOURCE_MAC.split(":")))
             # print("[INFO] BIN_SOURCE_MAC_DATA: [{}]".format(bin_source_mac_data.hex()))
-        
+
         if PKT_DEST_MAC:
             bin_dest_mac_data = bytes.fromhex("".join(PKT_DEST_MAC.split(":")))
             # print("[INFO] BIN_DEST_MAC_DATA: [{}]".format(bin_dest_mac_data.hex()))
@@ -416,7 +416,7 @@ if PKT_IS_SAVE:
             if pcap_bin[pos:pos+14] == bytes.fromhex('0000000000000000000000000800'):
                 dest_mac_pos   = pos
                 source_mac_pos = pos+6
-                
+
                 # next ip layer data
                 pos += 14
 
@@ -458,8 +458,8 @@ if PKT_IS_SAVE:
             else:
                 pos += 1
 
-            
-    
+
+
     f = open(PKT_FILE_PATH.split(".")[0] + ".pcap", 'wb')
     f.write(pcap_bin)
     f.close()
