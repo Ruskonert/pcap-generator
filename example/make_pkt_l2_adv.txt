@@ -1,0 +1,13 @@
+# This is used for declearing variables
+src_mac = 00:18:7d:ff:99:01
+dst_mac = 00:18:7d:ff:99:02
+broadcast_mac = ff:ff:ff:ff:ff:ff
+
+
+# This section is defining the payload data
+src_mac broadcast_mac 000000000000
+src_mac broadcast_mac 000000000001
+src_mac broadcast_mac 000000000002
+
+# ...or just typing mac address manually
+00:18:7d:ff:99:02 ff:ff:ff:ff:ff:ff 000000000003
